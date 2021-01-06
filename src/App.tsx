@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import "./styles.css";
+import Button from "@material-ui/core/Button";
 
 interface Person {
   name: string;
   age: number;
   pictureUrl: string;
+  gender: string;
 }
 
 export default function App() {
@@ -19,8 +21,8 @@ export default function App() {
       .then((res) => res.json())
       .then((json) => json.results)
       .then((_person) => _person[0])
-      .then(({ name: { first }, dob: { age }, picture: { large } }) =>
-        setFemale({ name: first, age: age, pictureUrl: large })
+      .then(({ name: { first }, dob: { age }, picture: { large }, gender }) =>
+        setFemale({ name: first, age: age, pictureUrl: large, gender: gender })
       )
       .catch(console.error);
     return () => {
@@ -34,8 +36,8 @@ export default function App() {
       .then((res) => res.json())
       .then((json) => json.results)
       .then((_person) => _person[0])
-      .then(({ name: { first }, dob: { age }, picture: { large } }) =>
-        setMale({ name: first, age: age, pictureUrl: large })
+      .then(({ name: { first }, dob: { age }, picture: { large }, gender }) =>
+        setMale({ name: first, age: age, pictureUrl: large, gender: gender })
       )
       .catch(console.error);
     return () => {
@@ -46,25 +48,32 @@ export default function App() {
   return (
     <div className="App">
       <h1>Tinder App</h1>
-      <img alt="female" src={female.pictureUrl} />
-      <div>
-        {female.name}, {female.age}
-      </div>
-      <button
-        disabled={isFemaleLoading}
-        onClick={() => setIsFemaleLoading(true)}
-      >
-        Next Female
-      </button>
-      <hr />
-      <img alt="male" src={male.pictureUrl} />
-      <div>
-        {male.name}, {male.age}
-      </div>
 
-      <button disabled={isMaleLoading} onClick={() => setIsMaleLoading(true)}>
-        Next Male
-      </button>
+      {[female, male].map((person) => {
+        return (
+          <>
+            <img alt={person.name} src={person.pictureUrl} />
+            <div>
+              {person.name}, {person.age},
+            </div>
+            <Button
+              variant="contained"
+              color={person.gender === "female" ? "secondary" : "primary"}
+              disabled={
+                person.gender === "female" ? isFemaleLoading : isMaleLoading
+              }
+              onClick={() =>
+                person.gender === "female"
+                  ? setIsFemaleLoading(true)
+                  : setIsMaleLoading(true)
+              }
+            >
+              Next {person.gender}
+            </Button>
+            <hr />
+          </>
+        );
+      })}
     </div>
   );
 }
